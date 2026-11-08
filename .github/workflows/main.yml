@@ -1,4 +1,4 @@
-name: Build and Package Web HTML
+name: Build HTML to Android APK
 
 on:
   push:
@@ -13,15 +13,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. ضغط ملفات الـ HTML والمشروع في ملف Zip واحد
-      - name: Compress files to ZIP
-        run: |
-          zip -r website-files.zip . -x ".git/*"
+      # 2. إعداد بيئة جافا (مطلوبة لتجميع تطبيقات أندرويد)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-      # 3. رفع الملف الناتج لكي يظهر زر التحميل في صفحة GitHub Actions
-      - name: Upload Web Artifact
+      # 3. إعداد أداة Cordova لإنشاء وتغليف تطبيق أندرويد من ملفات الويب
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Cordova and Android builder tools
+        run: |
+          npm install -g cordova
+          cordova create myApp com.example.archive "أرشيف أندرويد"
+          cd myApp
+          # نسخ ملفات الـ HTML الخاصة بك إلى مجلد التطبيق
+          cp -r ../* www/ 2>/dev/null || :
+          cordova platform add android
+
+      # 4. بناء ملف الـ APK النهائي
+      - name: Build APK
+        run: |
+          cd myApp
+          cordova build android --debug
+
+      # 5. رفع ملف الـ APK الناتج لكي يظهر زر التحميل في قسم Artifacts
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: html-website-package
-          path: website-files.zip
+          name: android-app-debug
+          path: myApp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
           
