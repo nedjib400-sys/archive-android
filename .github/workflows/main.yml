@@ -1,6 +1,5 @@
-name: CI
+name: Build Android APK
 
-# حدد الحدث الذي يشغل الـ Workflow هنا
 on:
   push:
     branches: [ "main" ]
@@ -8,9 +7,31 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. سحب الكود من المستودع
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      # أضف بقية الخطوات الخاصة بك هنا
-      
+
+      # 2. إعداد بيئة جافا (مهمة لبناء تطبيقات أندرويد)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. منح صلاحيات التنفيذ لأداة Gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 4. بناء ملف الـ APK
+      - name: Build APK with Gradle
+        run: ./gradlew assembleDebug
+
+      # 5. رفع ملف الـ APK الناتج لكي يظهر زر التحميل في صفحة GitHub Actions
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
