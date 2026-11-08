@@ -12,28 +12,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Create package configuration for Desktop wrapper
+      - name: Create Desktop Package ZIP
         run: |
-          # إنشاء ملف package.json تلقائياً لتعريف المشروع لـ pkg
-          echo '{"name": "archive-desktop", "version": "1.0.0", "main": "index.js"}' > package.json
-          
-          # إنشاء ملف تشغيل بسيطة يفتح الواجهة أو يتصل بالخادم المحلي
-          echo 'console.log("Starting Archive Desktop App...");' > index.js
-          
-          npm install -g pkg
+          # ضغط المشروع في ملف ZIP مخصص لإصدار سطح المكتب
+          Compress-Archive -Path * -DestinationPath archive-windows-desktop.zip -Force
 
-      - name: Compile to Windows EXE
-        run: |
-          pkg . --targets node18-win-x64 --output archive-desktop.exe
-
-      - name: Upload EXE Artifact
+      - name: Upload Desktop Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-desktop-app
-          path: archive-desktop.exe
+          path: archive-windows-desktop.zip
           
