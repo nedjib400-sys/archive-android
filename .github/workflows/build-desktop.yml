@@ -1,0 +1,35 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'desktop/**'
+      - '.github/workflows/build-desktop.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        working-directory: desktop
+        run: npm install
+
+      - name: Build EXE
+        working-directory: desktop
+        run: npm run build
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Archive-Windows
+          path: desktop/dist/*
