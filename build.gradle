@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'dz.archive.server'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'dz.archive.server'
+        minSdk 29
+        targetSdk 29
+        versionCode 12
+        versionName '1.3.0-alpha'
+    }
+}

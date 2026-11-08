@@ -1,0 +1,42 @@
+name: Build Archive APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.2.1
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.2.1'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Build debug APK
+        run: gradle --no-daemon :app:assembleDebug
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: archive-local-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
