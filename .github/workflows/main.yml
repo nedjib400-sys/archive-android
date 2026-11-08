@@ -1,1 +1,16 @@
+name: CI
 
+# حدد الحدث الذي يشغل الـ Workflow هنا
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # أضف بقية الخطوات الخاصة بك هنا
+      
