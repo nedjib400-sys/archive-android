@@ -1,0 +1,34 @@
+name: Build Archive Desktop
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build desktop application
+        shell: pwsh
+        run: |
+          cd desktop
+          npm install
+          npm run dist
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: Archive-Windows
+          path: desktop/dist/*.exe
+          if-no-files-found: error
